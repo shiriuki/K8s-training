@@ -1,0 +1,15 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: postgres
+  namespace: infra
+  labels:
+    app: db
+spec:
+  containers:
+  - name: postgres
+    image: postgres
+    env:
+    - name: POSTGRES_PASSWORD
+      value: postgres
+    

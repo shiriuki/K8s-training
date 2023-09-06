@@ -1,0 +1,104 @@
+// Gets list of resources in default namespace
+kubectl get all
+
+// List of resources of a specific type
+kubectl get <resource_type or short_name> -o wide --watch
+kubectl get nodes –o wide
+Kubectl get ev –o wide --watch
+kubectl get po -o wide --watch  // List pods. Why po?
+
+// Gets details about a specific resource
+kubectl describe <resource_type or short_name> <resource_name>
+kubectl describe node learn
+
+// Gets logs
+kubectl logs <pod_name or service_name> 
+kubectl logs --tail=20 <pod_name or service_name> // last 20 entries
+kubectl logs -f <pod_name or service_name> // monitor for new entries
+
+// This creates a pod with the name first and passes some env variables
+// That pod is running your image in a container
+kubectl run first --image=cloudnatived/demo:hello --env="TEXT=Hi" --env="OTHER=value2"
+
+// Opens a temporary channel through kubectl to access the pod’s containers ports
+// advantages don’t need to the pod’s IP or machine where it is running
+kubectl port-forward <pod_name> <local_port>:<pod_container_port>
+kubectl port-forward first 7777:8080
+curl http://localhost:7777
+
+// connects to the pod’s container
+kubectl exec -it pod_name -c container_name bash
+
+// Generates the yaml representation of a K8s resource
+kubectl get pod first -o yaml > firstPod.yaml
+
+ // Gives information about a K8s resource and its fields
+kubectl explain pod 
+
+ // Gives info about a field 
+kubectl explain pod.spec.containers.imagePullPolicy 
+
+// deploys a K8s resource described in yaml
+kubectl apply -f secondPod.yaml   
+
+// Get all resources and their current labels
+kubectl get all --show-labels -A
+
+// Filter resources by label
+kubectl get all -A -l tier=control-plane
+kubectl get pods -A -l google.com/customer=atc,google.com/bu!=finance
+
+// Adds labels to an existing K8s resource
+kubectl label <resource_type> <resource_id> google.com/nodetype=db
+kubectl label node learn-m02 google.com/nodetype=db –overwrite
+kubectl label all -l k8s-app=kube-dns -A mylabel=value
+
+// Adds annotations to an existing K8s resource
+kubectl annotate pod nginx \
+    pre.hook.backup.velero.io/command='["/sbin/fsfreeze", "--freeze", "/var/log/nginx"]' \
+    post.hook.backup.velero.io/command='["/sbin/fsfreeze", "--unfreeze", "/var/log/nginx"]'
+
+// To remove annotation
+kubectl annotate pod nginx post.hook.backup.velero.io/command-
+
+// Get the list of endpoints and the associated service 
+kubectl get endpoints
+
+// Create a namespace
+kubectl create namespace infra
+
+// Gets the existing namespaces
+kubectl get ns
+
+// Gets list of all resources in all namespaces
+kubectl get all -A
+
+// Get list of resources of a type in a specific namespace
+kubectl get <resource_type> -n <namespace>
+kubectl get pod -n kube-system
+
+// Sets the default namespace
+kubectl config set-context --current --namespace=infra
+
+// Set local-path as the default dynamic provisioner 
+// and the default volume type as local
+kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true","defaultVolumeType":"local"}}}'
+
+// Changes the number of replicas in a deployment
+k scale deploy nginx-deployment --replicas 5
+
+// Go back to the previous ReplicaSet
+k rollout undo deployment/nginx-deployment
+
+// Creates a new ReplicaSet and migrate pods to it
+k rollout restart deployment/nginx-deployment
+
+// Changes the number of replicas in a statefulset
+k scale sts/counter --replicas 5
+
+// Creates restarts sts pods
+k rollout restart sts/counter
+
+// Go back to the previous configuration
+k rollout undo sts/counter
+

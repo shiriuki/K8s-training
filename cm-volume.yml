@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config-map
+data:
+  currency: USD
+  headerColor: black
+  welcomeMsg: Hi there
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podv
+spec:
+  containers:
+  - name: echo
+    image: wardviaene/http-echo
+    volumeMounts:
+    - name: cm
+      mountPath: /cm
+  volumes:
+    - name: cm
+      configMap: 
+        name: my-config-map

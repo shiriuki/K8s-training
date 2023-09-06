@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config-map
+data:
+  currency: USD
+  headerColor: black
+  welcomeMsg: Hi there
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podm
+spec:
+  containers:
+  - name: echo
+    image: wardviaene/http-echo
+    env:
+    - name: TEXT
+      valueFrom:
+        configMapKeyRef:
+          name: my-config-map
+          key: welcomeMsg
