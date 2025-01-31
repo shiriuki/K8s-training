@@ -1,0 +1,24 @@
+
+This is to simulate a connection the machine where the Colima cluster is running:
+colima ssh -p k8s28
+
+This is to grpcurl in the machine where you need to use it:
+curl -fsSL -o grpcurl_1.9.1_linux_x86_64.tar.gz https://github.com/fullstorydev/grpcurl/releases/download/v1.9.1/grpcurl_1.9.1_linux_x86_64.tar.gz
+tar xvzf grpcurl_1.9.1_linux_x86_64.tar.gz
+sudo mv grpcurl /usr/local/bin/
+
+For a grpc app this will tell you which services/endpoints are in that app:
+grpcurl -max-time 30 -max-msg-sz 41943040 --plaintext 10.42.0.81:9002 describe 
+
+This is to execute one of those endpoints:
+grpcurl -max-time 30 -max-msg-sz 41943040 --plaintext -d '{"currency": "XXX"}' exchange-rate-service.default:9003 ExchangeRateService/GetExchangeRate
+
+
+To get a shell in a runnig container in a pod:
+kubectl exec -it exchange-rate --container exchange-rate  -- /bin/sh
+
+To test if the service name can be resolved through DNS:
+nslookup exchange-rate-service.default
+
+If your container is to restrictive (can't do sudo, can't install apos), you can dinamically attach a less restrictive container to a running pod:
+kubectl debug -it radixts-0 --target=timescaledb --image=bellsoft/liberica-openjdk-centos
